@@ -48,6 +48,15 @@ export default class GptService extends BaseService {
 
     async complete(config?: GptConfig) {
         let settingsStore = useSettingsStore();
+            if (!settingsStore.apiKey) {
+                settingsStore.apiKey = prompt('Please enter your OpenAI API key', settingsStore.apiKey ?? '');
+                settingsStore.saveSettings();
+
+                if (!settingsStore.apiKey) {
+                    return
+                }
+            }
+
             let source = new SSE(
                 `https://api.openai.com/v1/chat/completions`,
                 {
@@ -91,10 +100,7 @@ export default class GptService extends BaseService {
 
                 if (decoded.error.code == 'invalid_api_key') {
                     settingsStore.apiKey = prompt('Please enter your OpenAI API key', settingsStore.apiKey ?? '');
-
                     settingsStore.saveSettings();
-
-                    return this.complete(config);
                 }
 
                 if (decoded.error.code == 'context_length_exceeded' && settingsStore.model != settingsStore.largeModel)  {

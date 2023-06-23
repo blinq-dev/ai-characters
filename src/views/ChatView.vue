@@ -2,18 +2,17 @@
 <template>
   <div class="h-screen">
     <!-- Button bar -->
-    <div v-if="!chatStore.overlayIsShown" class="fixed z-20 top-0 left-0 right-0 flex gap-2  text-white p-5">
-      <button @click="router.push({ name: 'characters'})" class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">
+    <div v-if="!chatStore.overlayIsShown" class="fixed flex-grow-0 z-20 top-0 left-0 right-0 flex gap-2  text-white p-2 py-3 md:p-5 overflow-auto">
+      <button @click="router.push({ name: 'characters'})" class="whitespace-nowrap tracking-widestst  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-</svg>
-
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
       </button>
-      <button @click="chatStore.toggleOverlay()" class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">Settings</button>
-      <button @click="makeSummary" class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">Summarize</button>
-      <button @click="chatStore.clearMessages(currentCharacter?.getSlug())" class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">Clear messages</button>
-      <button @click="characterStore.deleteCharacter(currentCharacter)" class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">Delete</button>
-      <button class="backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg p-2">
+      <button @click="chatStore.toggleOverlay()" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1">Settings</button>
+      <button @click="makeSummary" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1">Summarize</button>
+      <button @click="chatStore.clearMessages(currentCharacter?.getSlug())" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1">Clear messages</button>
+      <button @click="characterStore.deleteCharacter(currentCharacter)" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1">Delete</button>
+      <button class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1.5">
         Est tokens: {{  chatStore.estimatedTokenCount }}
       </button>
     </div>
@@ -59,16 +58,16 @@
     </div>
     <!-- Chat -->
     <div class="flex flex-col h-full">
-      <div ref="scroller" class="flex grow overflow-y-auto pt-20">
-        <div ref="scrolled" class="flex w-full h-auto gap-2 flex-col m-3 md:m-6 !mt-auto">
+      <div ref="scroller" class="flex grow overflow-y-auto pt-32">
+        <div ref="scrolled" class="flex w-full h-auto gap-2 flex-col m-2 md:m-5 !mt-auto">
           <ChatBubble v-for="(message, index) in chatStore.messages" :show-user="chatStore.messagesSinceCheckpoint[index+1]?.name !== message.name || typeof chatStore.messagesSinceCheckpoint[index+1] === 'undefined'"  :key="message.id" :message="message" />
         </div>
       </div>
-      <div class="relative flex grow-0 shrink-0 mx-6 flex-col border-t border-t-2">
+      <div class="relative flex grow-0 shrink-0 px-2 md:px-6 flex-col border-t border-t-2">
         <textarea :placeholder="speechRecognitionService.interimTranscript.value" @keydown.enter="addMessageFromKeyboard" rows="3" class="py-2 text-lg resize-none focus:outline-none bg-transparent rounded-lg text-white" v-model="newMessage" />
 
         <button 
-           class=" backdrop-blur-xl  transition-all cursor-pointer hover:scale-105 absolute flex items-center justify-center right-0 top-4 w-10 h-10 rounded-full"
+           class="mr-2 md:mr-6 backdrop-blur-xl  transition-all cursor-pointer hover:scale-105 absolute flex items-center justify-center right-0 top-4 w-10 h-10 rounded-full"
           :class="{ 'backdrop-brightness-0 text-white !scale-100': speechRecognitionService.isListening.value, 'backdrop-brightness-90 text-white/40': !speechRecognitionService.isListening.value }"
           @click="toggleListen()"
         >
@@ -311,7 +310,7 @@ function makeGptResut(extraPromptText = '') {
     nextTick(() => {
       scrollToBottom()
 
-      surpriseMessage("Je gesprekspartner heeft al even niet gereageerd. Misschien kan je een vraag stellen?", 0.5, 0.5, 10000)
+      // surpriseMessage("Je gesprekspartner heeft al even niet gereageerd. Misschien kan je een vraag stellen?", 0.5, 0.5, 10000)
     });
   })
 

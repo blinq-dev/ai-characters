@@ -1,16 +1,16 @@
 <template>
-    <div v-if="props.message.role != 'system'" class="flex flex-col w-11/12 md:w-3/4 lg:w-2/3 xl:w-5/12" :class="{
+    <div v-if="props.message.role != 'system'" class="flex flex-col w-10/12 md:w-3/4 lg:w-2/3 xl:w-5/12" :class="{
         'self-end rounded-br-none': props.message.side == 'right',
         'self-start rounded-bl-none': props.message.side == 'left',
     }">
 
-        <div class="relative bg-white p-3 rounded-lg" :class="{
-            'mr-8': props.message.side == 'right',
-            'ml-8': props.message.side == 'left',
+        <div class="relative backdrop-blur-xl p-3 rounded-lg" :class="{
+            'mr-2 md:mr-8 backdrop-brightness-50 text-white': props.message.side == 'right',
+            'ml-2 md:ml-8 backdrop-brightness-200 text-black': props.message.side == 'left',
             'rounded-br-none': props.showUser && props.message.side == 'right',
             'rounded-bl-none': props.showUser && props.message.side == 'left',
         }">
-            <div class="absolute -mt-10 uppercase left-0 text-white bold text-sm flex gap-3">
+            <div class="absolute w-full px-3 items-center -mt-10 uppercase left-0 text-white bold text-sm flex gap-3">
                 <span v-if="props.message.isCheckpoint()">Checkpoint</span>
                 <button  @click="startEdit"  class="uppercase opacity-20 hover:opacity-100">Edit</button>
                 <button  @click="deleteEdit"  class="uppercase opacity-20 hover:opacity-100">Delete</button>
