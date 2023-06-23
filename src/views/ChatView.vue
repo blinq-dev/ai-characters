@@ -193,7 +193,7 @@ function makeSummary() {
   let msg = chatStore.addMessage(new ChatMessage('', 'SUMMARY', 'assistant'));
 
   let systemPrompt = currentCharacter.systemPrompt
-  let log = chatStore.chatLogSinceCheckpoint
+  let log = chatStore.chatLogForSummary
 
   console.log(log)
 

@@ -35,6 +35,19 @@ export const useChatStore = defineStore('chatStore', () => {
         return messages.value.slice(index)
     })
 
+    const newMessagesSinceCheckpoint = computed(() => {
+        let checkpoints = messages.value.filter((msg) => msg.name === 'SUMMARY' && msg.getContentWeirdBug().trim());
+        let lastCheckpoint = checkpoints[checkpoints.length - 1]
+
+        if (!lastCheckpoint) {
+            return messages.value
+        }
+
+        let index = messages.value.indexOf(lastCheckpoint)
+
+        return messages.value.slice(index + 1)
+    })
+
     const toggleOverlay = () => {
         overlayIsShown.value = !overlayIsShown.value
     }
@@ -44,6 +57,13 @@ export const useChatStore = defineStore('chatStore', () => {
     })
     const chatLogSinceCheckpoint = computed(() => {
         return messagesSinceCheckpoint.value.map(x => `${x.name} (${x.role}): ${x.getContentWeirdBug()}`).join('\n------------\n')
+    })
+    const chatLogForSummary = computed(() => {
+        let allCheckpointMessages = messages.value.filter((msg) => msg.name === 'SUMMARY' && msg.getContentWeirdBug().trim());
+        return [
+            ...allCheckpointMessages,
+            ...newMessagesSinceCheckpoint.value
+        ].map(x => `${x.name} (${x.role}): ${x.getContentWeirdBug()}`).join('\n------------\n')
     })
 
 
@@ -93,5 +113,6 @@ export const useChatStore = defineStore('chatStore', () => {
         toggleOverlay, 
         chatLog, 
         chatLogSinceCheckpoint,
+        chatLogForSummary
     }
 })
