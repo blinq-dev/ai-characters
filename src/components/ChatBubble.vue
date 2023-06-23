@@ -4,9 +4,9 @@
         'self-start rounded-bl-none': props.message.side == 'left',
     }">
 
-        <div class="relative backdrop-blur-xl p-3 rounded-lg" :class="{
-            'mr-2 md:mr-8 backdrop-brightness-50 text-white': props.message.side == 'right',
-            'ml-2 md:ml-8 backdrop-brightness-200 text-black': props.message.side == 'left',
+        <div class="relative backdrop-blur-xl p-2 rounded-lg" :class="{
+            'mr-1 md:mr-8 backdrop-brightness-50 text-white': props.message.side == 'right',
+            'ml-1 md:ml-8 backdrop-brightness-200 text-black': props.message.side == 'left',
             'rounded-br-none': props.showUser && props.message.side == 'right',
             'rounded-bl-none': props.showUser && props.message.side == 'left',
         }">

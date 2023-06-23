@@ -50,11 +50,11 @@ import { useSettingsStore } from '@/stores/settings';
 </script>
 
 <template>
-  <div class="fixed z-20 top-0 left-0 right-0 flex gap-2  text-white p-2 py-3 md:p-5">
-      <button @click="exportAllToClipboardJson" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1.5">Export</button>
-      <button @click="importAllFromClipboardJson" class="whitespace-nowrap tracking-widest  uppercase text-sm  backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-2 py-1.5">Import</button>
+  <div class="fixed z-20 top-0 left-0 right-0 flex gap-2  text-white p-4 md:p-6">
+      <button @click="exportAllToClipboardJson" class="whitespace-nowrap   backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-3 py-2">Export</button>
+      <button @click="importAllFromClipboardJson" class="whitespace-nowrap   backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-3 py-2">Import</button>
   </div>
-  <main class="p-2 md:p-6 pt-16 md:pt-24">
+  <main class="p-4 md:p-6 pt-20 md:pt-24">
     <div class="flex gap-2 w-full flex-wrap">
       <button v-for="character in characterStore.characters" v-bind:key="character.name" @click="$router.push('/chat/' + character.getSlug())" class="w-32 cursor-pointer h-32 flex flex-col items-center justify-center text-white backdrop-brightness-50 backdrop-blur-xl rounded-full" >
         <h2 class="text-2xl">{{ character.name }}</h2>
