@@ -43,7 +43,7 @@ export default class SpeechService extends BaseService {
         if (this.provider === null) return;
 
         this.voiceList.value = this.provider.getVoices()
-            .filter(voice => voice.lang.includes(this.language));
+            // .filter(voice => voice.lang.includes(this.language));
 
         // Prepend a off value
         this.voiceList.value.unshift({

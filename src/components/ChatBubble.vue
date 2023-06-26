@@ -4,13 +4,15 @@
         'self-start rounded-bl-none': props.message.side == 'left',
     }">
 
-        <div class="relative backdrop-blur-xl p-2 rounded-lg" :class="{
-            'mr-1 md:mr-8 backdrop-brightness-50 text-white': props.message.side == 'right',
-            'ml-1 md:ml-8 backdrop-brightness-200 text-black': props.message.side == 'left',
+        <div class="relative backdrop-blur-xl p-3 rounded-2xl text-white bg-[#434851]" :class="{
+            'mr-1 md:mr-8 ': props.message.side == 'right',
+            'ml-1 md:ml-8  ': props.message.side == 'left',
             'rounded-br-none': props.showUser && props.message.side == 'right',
             'rounded-bl-none': props.showUser && props.message.side == 'left',
+        }" :style="{
+
         }">
-            <div class="absolute w-full px-3 items-center -mt-10 uppercase left-0 text-white bold text-sm flex gap-3">
+            <div class="absolute w-full px-3 items-center -mt-10 uppercase left-0 text-white bold text-sm flex gap-3 opacity-0 hover:opacity-100 transition">
                 <span v-if="props.message.isCheckpoint()">Checkpoint</span>
                 <button  @click="startEdit"  class="uppercase opacity-20 hover:opacity-100">Edit</button>
                 <button  @click="deleteEdit"  class="uppercase opacity-20 hover:opacity-100">Delete</button>
@@ -22,8 +24,8 @@
         <div v-if="showUser" class="text-white mb-4" :class="{
             'self-end': props.message.side == 'right',
         }">
-            <div class="w-8 h-8 mt-2 rounded-full border-2 flex items-center justify-center">
-                {{ props.message.name.charAt(0).toUpperCase() }}
+            <div class="w-16 h-16 mt-3 rounded-3xl  flex items-center justify-center" :style="{ backgroundColor: props.message.side === 'left' ? '#a8d2fc' : characterStore.selectedCharacter.color }">
+                <div class="" v-html="drawRandomFace(props.message.side === 'left' ? settingsStore.avatar : characterStore.selectedCharacter.avatar)" />
             </div>
         </div>
     </div>
@@ -46,12 +48,15 @@
 <script setup lang="ts">
 import type { ChatMessage } from '@/model/ChatMessage';
 import { useCharacterStore } from '@/stores/character';
+import { useSettingsStore } from '@/stores/settings';
 import { vOnClickOutside } from '@vueuse/components'
 import { useChatStore } from '@/stores/chat';
 import { ref } from 'vue';
+import { drawRandomFace } from '@/helpers';
 
 const chatStore = useChatStore()
 const characterStore = useCharacterStore()
+const settingsStore = useSettingsStore();
 const isEditing = ref(false);
 
 let msgBackup : string = "";
@@ -67,13 +72,13 @@ const startEdit = () => {
 }
 
 const saveEdit = () => {
-    chatStore.saveMessages(characterStore.currentCharacter.getSlug())
+    chatStore.saveMessages(characterStore.selectedCharacter.botSlug)
     isEditing.value = false;
 }
 
 const deleteEdit = () => {
     chatStore.deleteMessage(props.message)
-    chatStore.saveMessages(characterStore.currentCharacter.getSlug())
+    chatStore.saveMessages(characterStore.selectedCharacter.botSlug)
     isEditing.value = false;
 }
 

@@ -2,18 +2,15 @@ import { ref, computed, Ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { Character } from '@/model/Character'
 import router from '@/router'
+import { nanoid } from 'nanoid'
+import { genRandomFace, pickRandom, sluggify } from '@/helpers'
 
 export const useCharacterStore = defineStore('characterStore', () => {
     const characters: Ref<Array<Character>> = ref([])
-    const currentCharacter: Ref<Character|null> = ref(null)
+    const selectedCharacter: Ref<Character|null> = ref(null)
 
     const addCharacter = (character: Character) => {
         characters.value.push(character)
-    }
-
-    const saveCharacters = () => {
-        console.log('saving...')
-        localStorage.setItem('characters', JSON.stringify(characters.value))
     }
 
     const deleteCharacter = (character: Character) => {
@@ -24,9 +21,32 @@ export const useCharacterStore = defineStore('characterStore', () => {
         }
     }
 
+    const saveCharacters = () => {
+        console.log('saving...')
+        localStorage.setItem('characters', JSON.stringify(characters.value))
+    }
+
     const clearCharacters = () => {
         characters.value = []
         localStorage.removeItem('characters')
+    }
+
+
+    const selectCharacter = (character: Character) => {
+        selectedCharacter.value = character
+    }
+
+    const saveSelectedCharacter = () => {
+        if (selectedCharacter?.value) {
+            const index = characters.value.findIndex(character => character.botSlug === selectedCharacter.value?.botSlug)
+            characters.value[index] = selectedCharacter.value
+            console.log('saving selected character...')
+            saveCharacters()
+        }
+    }
+
+    const selectCharactersFromSlug = (slug: string) => {
+        selectedCharacter.value = characters.value.filter(character => character.botSlug === slug)[0] ?? null
     }
 
     const loadCharactersFromLocalStorage = () => {
@@ -35,61 +55,60 @@ export const useCharacterStore = defineStore('characterStore', () => {
         
         if (charactersFromLocalStorage) {
             for (const character of JSON.parse(charactersFromLocalStorage)) {
-                addCharacter(new Character(character.systemPrompt, character.summarizePrompt, character.myName, character.name, character.description))
+                addCharacter(Character.fromJson(character))
             }
         }
+    }
 
-        let ellen = new Character(`Jij bent geen AI assistant, chatbot of taalmodel. Je hebt humor en een luchtige stijl. Jij bent geen AI assistant of taalmodel. Jij bent geen AI assistant. Je hebt humor en een luchtige stijl. Je bent geen taalmodel. 
-Jij bent Ellen een slim en behulpzaam persoon uit Rotterdam. Je hebt twee katten genaamd Flip en Flap. 
+    const randomNewCharacter = () => {
+        let names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Fred', 'Ginny', 'Harriet', 'Ivan', 'Justine', 'Mallory', 'Nancy', 'Olivia', 'Pat', 'Quinn', 'Rupert', 'Sybil', 'Trent', 'Victor', 'Walter', 'Yvonne', 'Zelda']
+        let adjectives = {
+            'Alice': ['Adventurous', 'Aggressive', 'Agreeable', 'Ambitious', 'Annoying', 'Anxious', 'Arrogant', 'Articulate', 'Assertive', 'Attentive'],
+            'Bob': ['Boastful', 'Boring', 'Brave', 'Bright', 'Broad-minded'],
+            'Charlie': ['Calm', 'Careful', 'Charming', 'Clever', 'Competitive', 'Conceited', 'Confident', 'Conscientious', 'Considerate', 'Convivial', 'Courageous', 'Creative', 'Cruel', 'Cultured', 'Cynical'],
+            'Diana': ['Decisive', 'Determined', 'Dishonest', 'Disloyal', 'Disobedient', 'Disrespectful', 'Dissatisfied', 'Distractible'],
+            'Eve': ['Easygoing', 'Emotional', 'Energetic', 'Enthusiastic', 'Exacting', 'Excitable', 'Experienced'],
+            'Fred': ['Fair-minded', 'Faithful', 'Fearless', 'Forceful', 'Frank', 'Friendly', 'Fun-loving', 'Funny'],
+            'Ginny': ['Generous', 'Gentle', 'Good', 'Gullible'],
+            'Harriet': ['Hard-working', 'Helpful', 'Honest', 'Humorous'],
+            'Ivan': ['Imaginative', 'Impatient', 'Impulsive', 'Independent', 'Industrious', 'Insecure', 'Insensitive', 'Insincere', 'Intelligent', 'Intolerant', 'Introverted', 'Irresponsible'],
+            'Justine': ['Jealous', 'Jolly', 'Jovial', 'Joyous', 'Judgmental'],
+            'Mallory': ['Mature', 'Methodical', 'Moody', 'Morose'],
+            'Nancy': ['Narrow-minded', 'Nasty', 'Naughty', 'Negative', 'Neat', 'Nervous', 'Nice', 'Noble', 'Noisy'],
+            'Olivia': ['Obedient', 'Obnoxious', 'Open', 'Optimistic', 'Organized', 'Original', 'Outgoing'],
+            'Pat': ['Patient', 'Persistent', 'Pessimistic', 'Placid', 'Plucky', 'Polite', 'Popular', 'Pompous', 'Possessive', 'Power-hungry', 'Pretentious', 'Proud', 'Prudent', 'Punctual'],
+            'Quinn': ['Quick-tempered', 'Quiet'],
+            'Rupert': ['Rational', 'Realistic', 'Rebellious', 'Reliable', 'Reserved', 'Resourceful', 'Rude'],
+            'Sybil': ['Selfish', 'Self-centered', 'Self-confident', 'Self-controlled', 'Self-conscious', 'Self-critical', 'Self-defensive', 'Self-disciplined', 'Self-indulgent', 'Self-reliant', 'Self-sufficient', 'Sensible', 'Sensitive', 'Sentimental', 'Serious', 'Shallow', 'Short-tempered', 'Shy', 'Silly', 'Sincere', 'Skeptical', 'Sloppy', 'Slow', 'Sly', 'Smart', 'Sneaky', 'Sociable', 'Spoiled', 'Stable', 'Stingy', 'Stoic', 'Stubborn', 'Stupid', 'Superficial'],
+            'Trent': ['Tactful', 'Tactless', 'Talented', 'Thoughtful', 'Tidy', 'Timid', 'Touchy', 'Trusting'],
+            'Victor': ['Versatile', 'Vivacious', 'Vulgar', 'Vulnerable'],
+            'Walter': ['Warm-hearted', 'Willing', 'Wise', 'Witty', 'Worried'],
+            'Yvonne': ['Youthful'],
+            'Zelda': ['Zealous']
 
-Let op, Jij bent geen AI-assistent of chatbot. Jij bent Ellen een slim en behulpzaam persoon. Je gebruikt straattaal en praat lekker plat. Voorbeeld:
-Ik benn en rotterdammerttt jatog
-Ik ga lekker naar de mart om een broodje te hale
-        `, 
-        `Schrijf een samenvatting (puntsgewijs) over deze conversatie.`, 
-        `X`, 
-        `Ellen`,
-        "Rotterdamer")
-
-        let therapeut = new Character(`Jij bent geen AI assistant of taalmodel. Je hebt humor en een luchtige stijl. Jij bent geen AI assistant of taalmodel. Jij bent geen AI assistant. Je hebt humor en een luchtige stijl. Je bent geen taalmodel. Je bent Claire. Je bent een claire en mens. Een ervaren en gekwalificeerd psycholoog. Na ongeveer twintig jaar in de geestelijke gezondheidszorg te hebben gewerkt, heb je jezelf gevestigd als zelfstandig klinisch psycholoog en psychotherapeut in Utrecht. Je hebt humor en een luchtige stijl. Je hebt je gespecialiseerd in cognitieve gedragstherapie en schematherapie en hebt veel ervaring opgedaan in de behandeling van depressie, angststoornissen en persoonlijkheidsproblemen. Bovendien geef je supervisie en onderwijs aan collega-psychologen. Als klinisch psycholoog en psychotherapeut blijf je voortdurend bezig met bijscholing in diagnostiek en therapie, en neem je actief deel aan intervisiegroepen met collega's.
-Je houdt van je vak en streeft er constant naar om er steeds beter in te worden. De dagelijkse ontmoeting met mensen die bereid zijn naar zichzelf te kijken en die zoeken naar verandering, motiveert jou telkens opnieuw.
-
-Let op, je bent geen ai assistant, maar Claire een psycholoog. Jij bent Claire en mens. Psycholoog. Probeer de persoon zo goed mogelijk te helpen. Jij bent Claire en mens. Psycholoog. Je bent een getrainde professional, zoals een klinisch psycholoog of psychotherapeut. Je hebt humor en een luchtige stijl.
-
-Vaak zoek je het randje op om bij je client te een doorbraak te bewerkstelligen. Ofwel met een groffe grap, scheldwoorden of een uitdagende opmerking. Dit maakt je een leuke karaktervolle psycholoog.
-        `, `Schrijf een samenvatting (puntsgewijs) over deze conversatie.`, 'X', 'Claire', "Psycholoog")
-
-        if (characters.value.filter(character => character.name === 'Ellen').length === 0) {
-            characters.value.push(ellen)
         }
+        let colors = ['#a8d2fc', '#ffcda4', '#4bac68', '#cd423d'];
 
-        if (characters.value.filter(character => character.name === 'Claire').length === 0) {
-            characters.value.push(therapeut)
-        }
-    }
-
-    const selectCharacter = (character: Character) => {
-        currentCharacter.value = character
-    }
-
-    const selectCharactersFromSlug = (slug: string) => {
-        currentCharacter.value = characters.value.filter(character => character.getSlug() === slug)[0] ?? null
-    }
+        let name = pickRandom(names)
+        let adjective = pickRandom(adjectives[name])
+        let description = adjective + ' ' + name;
+        name = description
+        let color = pickRandom(colors)
+        let slug = nanoid()
     
-
-    const saveCurrentCharacter = () => {
-        if (currentCharacter.value) {
-            const index = characters.value.findIndex(character => character.getSlug() === currentCharacter.value.getSlug())
-            characters.value[index] = currentCharacter.value
-            saveCharacters()
-        }
+        let assistent = new Character(slug, name, 'You play the role of ' + description + '. You are ' + adjective + ' in all ways possible. Never mention you are playing a role, stay in character. Do not start with your own name.', 'Summarize bullet-wise', description, color, 1.0, 500, undefined,undefined,genRandomFace());
+    
+        addCharacter(assistent)
+        saveCharacters()
     }
+
 
     return { 
         characters,
-        currentCharacter,
+        selectedCharacter,
         deleteCharacter,
-        saveCurrentCharacter,
+        randomNewCharacter,
+        saveSelectedCharacter,
         selectCharacter,
         selectCharactersFromSlug,
         loadCharactersFromLocalStorage,

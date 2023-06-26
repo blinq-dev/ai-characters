@@ -9,17 +9,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: CharactersView
+      component: () => import('../views/CharactersView.vue')
     },
     {
       path: '/chat/:slug',
       name: 'chatWithCharacter',
-      component: ChatView
+      component: () => import('../views/ChatView.vue')
     },
     {
       path: '/characters',
       name: 'characters',
-      component: CharactersView
+      component: () => import('../views/CharactersView.vue')
     },
     {
       path: '/about',
