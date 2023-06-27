@@ -4,11 +4,14 @@ import { Character } from '@/model/Character';
 import { ChatMessage } from '@/model/ChatMessage';
 import { useCharacterStore } from '@/stores/character';
 import { useChatStore } from '@/stores/chat';
+import { useStateStore } from '@/stores/state';
 import { useSettingsStore } from '@/stores/settings';
 import { nanoid } from 'nanoid';
+import GeneralSettings from '@/components/GeneralSettings.vue';
 
   let characterStore = useCharacterStore();
   let chatStore = useChatStore();
+  let stateStore = useStateStore();
   let settingsStore = useSettingsStore();
 
   async function exportAllToClipboardJson() {
@@ -50,7 +53,11 @@ import { nanoid } from 'nanoid';
   <div class="fixed z-20 top-0 left-0 right-0 flex gap-2  text-white p-4 md:p-6">
       <button @click="exportAllToClipboardJson" class="whitespace-nowrap   backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-3 py-2">Export</button>
       <button @click="importAllFromClipboardJson" class="whitespace-nowrap   backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-3 py-2">Import</button>
+      <button @click="stateStore.showGeneralSettings = !stateStore.showGeneralSettings" class="whitespace-nowrap   backdrop-brightness-50 backdrop-blur-xl text-white rounded-lg px-3 py-2">
+        Settings
+      </button>
   </div>
+  <GeneralSettings v-if="stateStore.showGeneralSettings" />
   <main class="p-4 md:p-6 pt-20 md:pt-24 mt-10">
     <div class="flex gap-y-10 gap-x-4 w-full flex-wrap">
       <button v-for="character in characterStore.characters" v-bind:key="character.botName" @click="$router.push('/chat/' + character.botSlug)" 

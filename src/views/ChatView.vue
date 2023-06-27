@@ -51,7 +51,9 @@
           </div>
           <div class="flex col-span-6 flex-col gap-2">
             <span>Color:</span>
-            <input v-model="color" class="border-transparent rounded-lg p-3 bg-black/40" />
+            <div class="flex gap-3 flex-row">
+              <div @click="color = c" v-for="c in settingsStore.availableColors" :style="{ backgroundColor: c }" class="w-10 h-10 cursor-pointer rounded-full"></div>
+            </div>
           </div>
           <div class="flex col-span-6 flex-col gap-2">
             <span>Temperature:</span>
@@ -275,7 +277,6 @@ function scrollToBottom() {
 
 function newRandomFace() {
   avatar.value = genRandomFace()
-  console.log('x')
 }
 
 function makeSummary() {

@@ -1,7 +1,7 @@
 import { ref, computed, Ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { ChatMessage } from '@/model/ChatMessage'
-import { drawRandomFace } from '@/helpers'
+import { drawRandomFace, genRandomFace } from '@/helpers'
 
 export const useSettingsStore = defineStore('settingsStore', () => {
     const myName : Ref<string> = ref("User")
@@ -9,8 +9,19 @@ export const useSettingsStore = defineStore('settingsStore', () => {
     const smallModel : Ref<string> = ref("gpt-3.5-turbo-0613")
     const largeModel : Ref<string> = ref("gpt-3.5-turbo-16k")
     const apiKey : Ref<string|null> = ref(null)
-    const avatar : Ref<string|null> = ref(drawRandomFace())
+    const avatar : Ref<object|null> = ref(genRandomFace())
     const color : Ref<string|null> = ref("#a8d2fc")
+
+    const availableColors = [
+        "#a8d2fc",
+        "#ffcbdb",
+        "#ffadad",
+        "#ffd6a5",
+        "#fdffb6",
+        "#caffbf",
+        "#9bf6ff",
+        "#a0c4ff",
+    ]
 
     function saveSettings() {
         localStorage.setItem('settings', JSON.stringify({
@@ -37,11 +48,18 @@ export const useSettingsStore = defineStore('settingsStore', () => {
         }
     }
 
+    // watch all
+    watch([model, smallModel, largeModel, apiKey, myName, avatar, color], () => {
+        model.value = smallModel.value
+        saveSettings()
+    })
+
     return { 
         model,
         smallModel,
         largeModel,
         apiKey,
+        availableColors,
         saveSettings,
         loadSettings,
         myName,
